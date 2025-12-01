@@ -69,6 +69,19 @@
             border: 2px solid white;
             box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
         }
+        
+        /* 新增：假資料提示標籤 */
+        .mock-pill {
+            background: #ff7f7f; /* 醒目的紅色 */
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 10px;
+            display: inline-block;
+            transform: rotate(2deg);
+        }
 
         .update-pill {
             font-size: 0.8rem;
@@ -264,7 +277,10 @@
         <p style="color: white; font-weight: bold; margin-top: 20px;">正在觀測雲的流動...</p>
     </div>
     <div class="status-bar">
-        <div class="location-pill">📍 苗栗縣</div>
+        <div class="location-pill">
+            📍 苗栗縣
+            <span id="mockDataIndicator"></span>
+        </div>
         <div id="updateTime" class="update-pill">更新中...</div>
     </div>
 
@@ -280,7 +296,15 @@
     </div>
 
     <script>
+        // === 1. 真假資料控制區 ===
         const API_URL = "https://weather-backend-midi.zeabur.app/api/weather/kaohsiung";
+        // 假資料的路徑 (請替換成您 Github 上的 Raw 連結或本地路徑)
+        const MOCK_DATA_URL = "./maioli-weather-3days.json"; 
+        // ========================
+        // 🚨檢查 URL 中是否有 ?mock=true 參數
+        const urlParams = new URLSearchParams(window.location.search);
+        // 如果 URL 中包含 mock 參數，且值為 'true'，則設定為 true
+        const USE_MOCK_DATA = urlParams.get('mock') === 'true';
 
         function getWeatherIcon(weather) {
             if (!weather) return "🌤️";
@@ -373,13 +397,13 @@
                 }
 
                 scrollContainer.innerHTML += `
-                            <div class="mini-card">
-                                <div class="mini-time">${p}</div>
-                                <div class="mini-icon">${getWeatherIcon(f.weather)}</div>
-                                <div class="mini-temp">${f.minTemp}° - ${f.maxTemp}°</div>
-                                <div style="font-size:0.8rem; color:#888; margin-top:5px;">💧${f.rain}</div>
-                            </div>
-                        `;
+                                <div class="mini-card">
+                                    <div class="mini-time">${p}</div>
+                                    <div class="mini-icon">${getWeatherIcon(f.weather)}</div>
+                                    <div class="mini-temp">${f.minTemp}° - ${f.maxTemp}°</div>
+                                    <div style="font-size:0.8rem; color:#888; margin-top:5px;">💧${f.rain}</div>
+                                </div>
+                            `;
             });
 
             // 3. 右上角顯示今日日期
@@ -393,29 +417,63 @@
         }
 
         async function fetchWeather() {
+            let dataUrl = API_URL;
+            let source = '真實 API';
+            // 取得指示器元素
+            const indicatorEl = document.getElementById('mockDataIndicator');            
+            // 根據 USE_MOCK_DATA 判斷使用哪一個 URL
+            if (USE_MOCK_DATA) {
+                dataUrl = MOCK_DATA_URL;
+                source = '假資料 JSON';
+                // 在標籤上顯示提示
+                if (indicatorEl) {
+                    indicatorEl.className = 'mock-pill'; // 套用視覺樣式
+                    indicatorEl.textContent = '假資料模式'; // 寫入文字
+                }
+                console.log('%c[資料來源]: 啟用假資料模式，讀取檔案: ' + MOCK_DATA_URL, 'color: #ff7f7f; font-weight: bold;');
+            } else {
+                // 如果是真實 API，在 Console 顯示提示
+                if (indicatorEl) {
+                    indicatorEl.className = '';
+                    indicatorEl.textContent = '';
+                }
+                console.log('%c[資料來源]: 讀取真實 API: ' + API_URL, 'color: #007bff; font-weight: bold;');
+            }
+
             try {
                 // 1. 定義「最低等待時間」：1500 毫秒 (1.5秒)
                 const delayPromise = new Promise(resolve => setTimeout(resolve, 1500));
 
-                // 2. 定義「抓取資料」的工作
-                const fetchPromise = fetch(API_URL).then(res => res.json());
+                // 2. 定義「抓取資料」的工作 (使用 dataUrl)
+                const fetchPromise = fetch(dataUrl).then(res => {
+                    // 檢查 HTTP 狀態碼
+                    if (!res.ok) {
+                        throw new Error(`HTTP 錯誤! 狀態碼: ${res.status}`);
+                    }
+                    return res.json();
+                });
 
                 // 3. Promise.all 會等待「兩個都完成」才會往下走
-                // result 陣列裡，第一個是 delay 的結果(沒用到)，第二個是 api 的 json 資料
                 const [_, json] = await Promise.all([delayPromise, fetchPromise]);
 
+                // 假資料也需要檢查是否成功 (假設 JSON 結構相同)
                 if (json.success) {
                     renderWeather(json.data);
 
                     // 資料處理好後，隱藏 Loading，顯示主畫面
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('mainContent').style.display = 'block';
+                    console.log(`[${source}] 資料成功渲染。`);
+
                 } else {
-                    throw new Error("API Error");
+                    // 如果 API/假資料 裡的 success 是 false
+                    throw new Error(`[${source}] 資料結構錯誤: success: false`);
                 }
             } catch (e) {
-                console.error(e);
-                alert("天氣資料讀取失敗，狸克把網路線咬斷了！");
+                console.error(`%c[錯誤發生]: 無法取得 ${source} 資料.`, 'color: red; font-weight: bold;', e);
+                // 讀取失敗時，移除 loading 畫面並顯示錯誤提示
+                document.getElementById('loading').style.display = 'none';
+                alert(`天氣資料讀取失敗，來源: ${source}。請檢查檔案路徑或網路連線！(錯誤訊息: ${e.message})`);
             }
         }
 

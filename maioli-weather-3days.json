@@ -1,0 +1,39 @@
+{
+    "success": true,
+    "data": {
+        "city": "苗栗縣",
+        "updateTime": "三十六小時天氣預報",
+        "forecasts": [
+            {
+                "startTime": "2025-12-01 18:00:00",
+                "endTime": "2025-12-02 06:00:00",
+                "weather": "晴時多雲",
+                "rain": "10%",
+                "minTemp": "18°C",
+                "maxTemp": "21°C",
+                "comfort": "稍有寒意至舒適",
+                "windSpeed": ""
+            },
+            {
+                "startTime": "2025-12-02 06:00:00",
+                "endTime": "2025-12-02 18:00:00",
+                "weather": "多雲時晴",
+                "rain": "10%",
+                "minTemp": "18°C",
+                "maxTemp": "25°C",
+                "comfort": "稍有寒意至舒適",
+                "windSpeed": ""
+            },
+            {
+                "startTime": "2025-12-02 18:00:00",
+                "endTime": "2025-12-03 06:00:00",
+                "weather": "多雲短暫雨",
+                "rain": "30%",
+                "minTemp": "17°C",
+                "maxTemp": "21°C",
+                "comfort": "稍有寒意至舒適",
+                "windSpeed": ""
+            }
+        ]
+    }
+}
