@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>森森天氣</title>
+    <title>天氣瓶安順時中 🦋~</title>
     <link rel="icon" type="image/png" href="./icon-v2.png">
     <link rel="apple-touch-icon" href="./icon-v2.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="./icon-v2.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./icon-stormglass.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap"
@@ -15,16 +15,16 @@
 
     <style>
         :root {
-            --ac-green: #7DE1A9;
-            --ac-bg-pattern: #8FD8AF;
-            --ac-cream: #FFFEF2;
-            --ac-yellow: #F9F195;
-            --ac-brown: #796452;
-            --ac-blue: #4FB5D9;
-            --ac-dark: #58504A;
+            /* 【修改 1-1】新的顏色變數 (木紋/玻璃/深色基調) */
+            --ac-wood-dark: #4A3A2A; /* 深棕色，木紋底色 */
+            --ac-wood-medium: #796452; /* 中棕色 */
+            --ac-cream: #FFFEF2; /* 淺色卡片底色 */
+            --ac-glass-bg: rgba(255, 255, 255, 0.75); /* 玻璃卡片背景 */
+            --ac-blue-sky: #4FB5D9;
+            --ac-dark: #333333; /* 幾乎黑的字體 */
+            --ac-text-light: #FFFEF2; /* 淺色文字 (用於深色背景) */
             --ac-card-border: #E6E0C8;
-            /* 新增：Line 官方顏色 */
-            --line-green: #00C300; 
+            --line-green: #00C300;
             --line-green-dark: #008D00;
         }
 
@@ -37,19 +37,25 @@
 
         body {
             font-family: 'Zen Maru Gothic', sans-serif;
-            background-color: var(--ac-green);
-            /* 更細緻的斜紋背景 */
-            background-image:
-                repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255, 255, 255, 0.2) 20px, rgba(255, 255, 255, 0.2) 40px);
+            
+            /* 設定圖片為主要背景 */
+            background-color: var(--ac-wood-dark); /* 圖片圓形邊緣為黑色，設定純黑背景 */
+            background-image: url('./icon-stormglass.png'); 
+            
+            /* 讓圖片完全顯示在螢幕內，並置中 */
+            background-size: cover; 
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* 讓背景圖片固定，不隨內容滾動 */
             min-height: 100vh;
-            color: var(--ac-dark);
-            /* 防止 iOS 左右滑動 */
+            color: var(--ac-wood-dark);
             overflow-x: hidden;
             padding-bottom: 20px;
         }
 
         /* 頂部狀態列 */
         .status-bar {
+            /* 保持半透明和模糊效果 */
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -59,51 +65,58 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            color: var(--ac-text-light); /* 淺色文字 */
+        }
+        
+        /* 調整地點文字在深色背景上為淺色 */
+        .status-bar > div {
+            color: var(--ac-text-light);
         }
 
         /* 新增：切換鄉鎮按鈕的基底樣式 */
         .town-switch-btn {
-            background: var(--ac-yellow);
-            color: var(--ac-brown);
-            padding: 8px 15px; /* 稍微大一點點，更好點擊 */
+            /* 按鈕樣式改為與木紋背景搭的圓潤淺色 */
+            background: var(--ac-cream);
+            color: var(--ac-wood-medium);
+            padding: 8px 15px;
             border-radius: 20px;
             font-weight: 700;
             font-size: 0.9rem;
             cursor: pointer;
             border: 2px solid white;
-            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+            box-shadow: 2px 2px 0 var(--ac-wood-medium); /* 深棕色陰影 */
             transition: transform 0.1s;
         }
 
         .town-switch-btn:active {
             transform: translateY(1px);
-            box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
+            box-shadow: 1px 1px 0 var(--ac-wood-medium);
         }
 
-        /* 【重要】新版：Line 分享按鈕樣式 (仿下載按鈕+綠色) */
+        /* Line 分享按鈕樣式 */
         .line-share-btn {
-            background: var(--line-green); /* 綠色背景 */
-            color: white; /* 白色文字 */
-            padding: 8px 15px; 
+            background: var(--line-green);
+            color: white;
+            padding: 8px 15px;
             border-radius: 20px;
             font-weight: 700;
-            font-size: 0.9rem; /* 與 .town-switch-btn 保持一致 */
+            font-size: 0.9rem;
             cursor: pointer;
             border: 2px solid white;
-            box-shadow: 2px 2px 0 var(--line-green-dark); /* 使用深一點的橘色作為陰影 */
+            box-shadow: 2px 2px 0 var(--line-green-dark);
             transition: transform 0.1s;
-            display: flex; /* 讓圖示和文字並排 */
+            display: flex;
             align-items: center;
-            gap: 5px; /* 圖示和文字間距 */
-            white-space: nowrap; /* 防止按鈕內的文字換行 */
+            gap: 5px;
+            white-space: nowrap;
         }
         
         .line-share-btn:active {
             transform: translateY(1px);
-            box-shadow: 1px 1px 0 var(--ac-orange-dark);
+            box-shadow: 1px 1px 0 var(--line-green-dark);
         }
 
-        /* 新增：假資料提示標籤 */
+        /* 假資料提示標籤 */
         .mock-pill {
             background: #ff7f7f;
             color: white;
@@ -119,29 +132,30 @@
         .container {
             padding: 20px;
             max-width: 600px;
-            /* 限制在大手機寬度 */
             margin: 0 auto;
         }
 
-        /* === 核心：今日焦點卡片 === */
+        /* === 核心：今日焦點卡片 (玻璃瓶體效果) === */
         .hero-card {
-            background: var(--ac-cream);
+            /* 【修改 1-3】核心卡片：模擬玻璃感 */
+            background: var(--ac-glass-bg); /* 半透明淺色 */
+            backdrop-filter: blur(5px); /* 模糊效果，增加玻璃感 */
             border-radius: 35px;
             padding: 30px 25px;
             text-align: center;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            border: 4px solid white;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* 更重的陰影，增加立體感 */
+            border: 3px solid rgba(255, 255, 255, 0.8); /* 淺色邊框 */
             margin-bottom: 25px;
             position: relative;
         }
 
-        /* 像動森的對話氣泡 */
+        /* 對話氣泡 */
         .hero-period {
             position: absolute;
             top: -15px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--ac-blue);
+            background: var(--ac-blue-sky); /* 保持藍色 */
             color: white;
             padding: 5px 20px;
             border-radius: 20px;
@@ -151,60 +165,46 @@
         }
 
         .hero-temp-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
             gap: 10px;
             margin: 15px 0;
         }
 
+        /* 主 icon 讓它更像天氣瓶裡的結晶/物體 */
         .hero-icon {
             font-size: 5rem;
             filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.1));
-            animation: bounce 3s infinite;
+            animation: float 4s infinite ease-in-out; /* 模擬浮動 */
         }
 
-        @keyframes bounce {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
+        /* 新增浮動動畫 (更像結晶在水中) */
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(0, -10px); }
+            100% { transform: translate(0, 0); }
         }
 
         .hero-temp {
             font-size: 4.5rem;
             font-weight: 900;
-            color: var(--ac-brown);
+            color: var(--ac-wood-medium); /* 棕色文字 */
             line-height: 1;
         }
 
         .hero-desc {
             font-size: 1.5rem;
-            color: #8A7B70;
+            color: var(--ac-wood-medium); /* 棕色文字 */
             margin-bottom: 20px;
             font-weight: bold;
         }
 
-        /* === 上班族最愛的：快速建議區 === */
+        /* === 快速建議區 === */
         .advice-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px dashed #E0D8C0;
+            border-top: 2px dashed #C8BCAC; /* 淺一點的虛線 */
         }
 
         .advice-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.5);
+            /* 讓建議項目更輕盈一點 */
+            background: rgba(255, 255, 255, 0.5); 
             padding: 10px;
             border-radius: 20px;
         }
@@ -214,51 +214,43 @@
             margin-bottom: 5px;
         }
 
+        /* 【修改 3-1】建議文字加粗，並讓它有詩詞感 */
         .advice-text {
-            font-size: 1.4rem;
+            font-size: 1.2rem; /* 為了容納七言絕句，字體縮小一點 */
             font-weight: 900;
-            color: var(--ac-brown);
+            color: var(--ac-wood-dark);
             margin: 5px 0;
-            line-height: 1.2;
+            line-height: 1.5; /* 增加行高 */
         }
 
         /* === 稍後預報：橫向滑動區 === */
         .section-title {
             font-size: 1.2rem;
-            color: white;
+            color: var(--ac-text-light); /* 淺色標題 */
             margin-bottom: 15px;
             margin-left: 10px;
             font-weight: 900;
-            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
+            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
         }
 
         .scroll-container {
-            display: flex;
-            overflow-x: auto;
-            gap: 15px;
             padding-bottom: 10px;
-            /* 隱藏滾動條但保留功能 */
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .scroll-container::-webkit-scrollbar {
-            display: none;
         }
 
         .mini-card {
+            /* 【修改 1-4】小卡片：略微透明，模擬玻璃感 */
             min-width: 140px;
             background: rgba(255, 255, 255, 0.85);
             border-radius: 25px;
             padding: 20px 15px;
             text-align: center;
-            border: 3px solid white;
+            border: 3px solid rgba(255, 255, 255, 0.8);
             flex-shrink: 0;
-            /* 防止被擠壓 */
         }
 
         .mini-time {
-            background: var(--ac-green);
+            /* 小卡片時間標籤顏色調整 */
+            background: var(--ac-wood-medium);
             color: white;
             padding: 3px 10px;
             border-radius: 10px;
@@ -286,7 +278,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: var(--ac-green);
+            background: var(--ac-wood-dark);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -298,11 +290,11 @@
 
 <body>
     <div id="loading" class="loading-screen">
-        <div style="font-size: 4rem; animation: bounce 2s infinite;">☁️</div>
-        <p style="color: white; font-weight: bold; margin-top: 20px;">正在觀測雲的流動...</p>
+        <div style="font-size: 4rem; animation: float 2s infinite;">🦋</div>
+        <p style="color: white; font-weight: bold; margin-top: 20px;">正在觀測結晶的變化...</p>
     </div>
     
-    <div class="status-bar">
+    <div class="status-bar" id="status-bar">
         <div id="currentLocationText" style="font-size: 1.1rem; font-weight: 700;">
             <span id="currentTownship">載入中...</span>
             <span id="mockDataIndicator"></span>
@@ -313,8 +305,7 @@
         </button>
 
         <button id="lineShareButton" class="line-share-btn">
-            <span style="font-size: 1.1rem;">⬆</span>
-            分享到 LINE
+            <span style="font-size: 1.1rem;">🦋</span> 分享到LINE
         </button>
     </div>
 
@@ -323,7 +314,7 @@
         <div id="heroCard">
         </div>
 
-        <h3 class="section-title">稍後預報</h3>
+        <h3 class="section-title">🔮 天氣瓶預言</h3>
         <div class="scroll-container" id="futureForecasts">
         </div>
 
@@ -341,31 +332,39 @@
         const USE_MOCK_DATA = urlParams.get('mock') === 'true';
 
         function getWeatherIcon(weather) {
-            if (!weather) return "🌤️";
+            if (!weather) return "✨"; // 預設改為結晶
             if (weather.includes("晴")) return "☀️";
-            if (weather.includes("多雲")) return "⛅";
+            if (weather.includes("多雲")) return "🌥️";
             if (weather.includes("陰")) return "☁️";
-            if (weather.includes("雨")) return "🌧️";
-            if (weather.includes("雷")) return "⛈️";
-            return "🌤️";
+            if (weather.includes("雨")) return "💧"; // 雨天使用水滴，更像天氣瓶內的液體
+            if (weather.includes("雷")) return "⚡";
+            return "✨";
         }
 
+        // 【修改 3-2】文案修改：七言絕句+天氣瓶概念
         function getAdvice(rainProb, maxTemp) {
-            let rainIcon = "🌂";
-            let rainText = "不用帶傘";
+            let rainIcon = "🦋";
+            let rainText = "晴空一鶴排雲上，不帶蓑衣亦無妨。"; // 晴天，不用帶傘
+            
+            // 降雨率超過 30%
             if (parseInt(rainProb) > 30) {
                 rainIcon = "☂️";
-                rainText = "記得帶傘！";
+                rainText = "天瓶已結雨花形，出門定要備油傘。"; // 雨天，記得帶傘
+            } else if (parseInt(rainProb) > 10) {
+                // 降雨率在 11%-30%
+                rainIcon = "🌂";
+                rainText = "輕雲偶有薄雨來，行裝傘具亦隨身。"; // 可能會下雨，帶備用
             }
 
-            let clothIcon = "👕";
-            let clothText = "舒適穿搭";
+            let clothIcon = "🧥";
+            let clothText = "秋水伊人憑欄望，添件薄衫亦相宜。"; // 預設加件外套
+            
             if (parseInt(maxTemp) >= 28) {
                 clothIcon = "🎽";
-                clothText = "短袖出發";
+                clothText = "酷暑炎炎日頭烈，輕羅小扇撲流螢。"; // 炎熱，短袖
             } else if (parseInt(maxTemp) <= 20) {
-                clothIcon = "🧥";
-                clothText = "加件外套";
+                clothIcon = "🧣";
+                clothText = "寒氣逼人風露重，厚裘暖炭保平安。"; // 寒冷，厚外套
             }
 
             return { rainIcon, rainText, clothIcon, clothText };
@@ -373,11 +372,11 @@
 
         function getTimePeriod(startTime) {
             const hour = new Date(startTime).getHours();
-            if (hour >= 5 && hour < 11) return "早晨";
-            if (hour >= 11 && hour < 14) return "中午";
-            if (hour >= 14 && hour < 18) return "下午";
-            if (hour >= 18 && hour < 23) return "晚上";
-            return "深夜";
+            if (hour >= 5 && hour < 11) return "清晨"; // 調整用語
+            if (hour >= 11 && hour < 14) return "正午"; // 調整用語
+            if (hour >= 14 && hour < 18) return "向晚"; // 調整用語
+            if (hour >= 18 && hour < 23) return "夜闌"; // 調整用語
+            return "子夜"; // 調整用語
         }
 
         function renderWeather(data) {
@@ -397,18 +396,18 @@
                         <div class="hero-icon">${getWeatherIcon(current.weather)}</div>
                         <div class="hero-temp">${avgTemp}°</div>
                     </div>
-                    <div class="hero-desc">${current.weather}</div>
+                    <div class="hero-desc">瓶中結晶：${current.weather}</div>
                     
                     <div class="advice-grid">
                         <div class="advice-item">
                             <div class="advice-icon">${advice.rainIcon}</div>
                             <div class="advice-text">${advice.rainText}</div>
-                            <div style="font-size:0.7rem; color:#999">降雨率 ${current.rain}</div>
+                            <div style="font-size:0.7rem; color:#888">降雨率 ${current.rain}</div>
                         </div>
                         <div class="advice-item">
                             <div class="advice-icon">${advice.clothIcon}</div>
                             <div class="advice-text">${advice.clothText}</div>
-                            <div style="font-size:0.7rem; color:#999">最高溫 ${current.maxTemp}°</div>
+                            <div style="font-size:0.7rem; color:#888">氣溫 ${current.minTemp}° ~ ${current.maxTemp}°</div>
                         </div>
                     </div>
                 </div>
@@ -427,7 +426,10 @@
                 // 判斷該預報的日期是否跟今天不同，不同就是明天
                 const fDate = new Date(f.startTime);
                 if (fDate.getDate() !== todayDate) {
-                    p = "明天" + p;
+                    p = "明日" + p; // 明日取代明天
+                }
+                else {
+                    p = "今日" + p; // 今日標示
                 }
 
                 scrollContainer.innerHTML += `
@@ -456,20 +458,17 @@
         async function fetchWeather() {
             let dataUrl = API_URL;
             let source = '真實 API';
-            // 取得指示器元素
             const indicatorEl = document.getElementById('mockDataIndicator');
-            // 根據 USE_MOCK_DATA 判斷使用哪一個 URL
+
             if (USE_MOCK_DATA) {
                 dataUrl = MOCK_DATA_URL;
                 source = '假資料 JSON';
-                // 在標籤上顯示提示
                 if (indicatorEl) {
-                    indicatorEl.className = 'mock-pill'; // 套用視覺樣式
-                    indicatorEl.textContent = '假資料模式'; // 寫入文字
+                    indicatorEl.className = 'mock-pill';
+                    indicatorEl.textContent = '假資料模式';
                 }
                 console.log('%c[資料來源]: 啟用假資料模式，讀取檔案: ' + MOCK_DATA_URL, 'color: #ff7f7f; font-weight: bold;');
             } else {
-                // 如果是真實 API，在 Console 顯示提示
                 if (indicatorEl) {
                     indicatorEl.className = '';
                     indicatorEl.textContent = '';
@@ -478,37 +477,28 @@
             }
 
             try {
-                // 1. 定義「最低等待時間」：1500 毫秒 (1.5秒)
                 const delayPromise = new Promise(resolve => setTimeout(resolve, 1500));
-
-                // 2. 定義「抓取資料」的工作 (使用 dataUrl)
                 const fetchPromise = fetch(dataUrl).then(res => {
-                    // 檢查 HTTP 狀態碼
                     if (!res.ok) {
                         throw new Error(`HTTP 錯誤! 狀態碼: ${res.status}`);
                     }
                     return res.json();
                 });
 
-                // 3. Promise.all 會等待「兩個都完成」才會往下走
                 const [_, json] = await Promise.all([delayPromise, fetchPromise]);
 
-                // 假資料也需要檢查是否成功 (假設 JSON 結構相同)
                 if (json.success) {
                     renderWeather(json.data);
 
-                    // 資料處理好後，隱藏 Loading，顯示主畫面
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('mainContent').style.display = 'block';
                     console.log(`[${source}] 資料成功渲染。`);
 
                 } else {
-                    // 如果 API/假資料 裡的 success 是 false
                     throw new Error(`[${source}] 資料結構錯誤: success: false`);
                 }
             } catch (e) {
                 console.error(`%c[錯誤發生]: 無法取得 ${source} 資料.`, 'color: red; font-weight: bold;', e);
-                // 讀取失敗時，移除 loading 畫面並顯示錯誤提示
                 document.getElementById('loading').style.display = 'none';
                 alert(`天氣資料讀取失敗，來源: ${source}。請檢查檔案路徑或網路連線！(錯誤訊息: ${e.message})`);
             }
@@ -517,8 +507,8 @@
         // Line 分享功能實作
         function shareToLine() {
             const url = encodeURIComponent(window.location.href);
-            const text = encodeURIComponent(`【森森天氣】看看我這裡的最新天氣！超可愛介面！\n`);
-            // 由於 Line 分享連結不需要 API 支援，直接使用瀏覽器導向即可
+            // 【修改 2】分享文案也一同修改
+            const text = encodeURIComponent(`【天氣瓶安順時中 🦋~】結晶預示：不管什麼天氣，都能有最好的安排！\n`);
             window.open(`https://social-plugins.line.me/lineit/share?url=${url}&text=${text}`, '_blank');
         }
 
@@ -535,7 +525,7 @@
             const switchBtn = document.getElementById('switchTownButton');
             if (switchBtn) {
                 switchBtn.addEventListener('click', () => {
-                    alert("切換鄉鎮功能將在未來版本提供！敬請期待！");
+                    alert("🔮 天氣瓶預言：切換鄉鎮功能將在未來版本提供！敬請期待！");
                 });
             }
         });
