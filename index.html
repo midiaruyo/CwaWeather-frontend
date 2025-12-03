@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>天氣瓶安順時中 🦋~</title>
-    <link rel="icon" type="image/png" href="./icon-v2.png">
-    <link rel="apple-touch-icon" href="./icon-v2.png">
+    <link rel="icon" type="image/png" href="./icon-stormglass.png">
+    <link rel="apple-touch-icon" href="./icon-stormglass.png">
     <link rel="apple-touch-icon" sizes="180x180" href="./icon-stormglass.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,8 +23,9 @@
             --ac-blue-sky: #4FB5D9;
             --ac-dark: #333333; /* 幾乎黑的字體 */
             --ac-text-light: #FFFEF2; /* 淺色文字 (用於深色背景) */
+            --ac-yellow: #F9F195;
             --ac-card-border: #E6E0C8;
-            --line-green: #00C300;
+            --line-green:rgba(0, 128, 0, 0.425);
             --line-green-dark: #008D00;
         }
 
@@ -39,11 +40,11 @@
             font-family: 'Zen Maru Gothic', sans-serif;
             
             /* 設定圖片為主要背景 */
-            background-color: var(--ac-wood-dark); /* 圖片圓形邊緣為黑色，設定純黑背景 */
+            background-color: white; /* 圖片圓形邊緣為黑色，設定純黑背景 */
             background-image: url('./icon-stormglass.png'); 
             
             /* 讓圖片完全顯示在螢幕內，並置中 */
-            background-size: cover; 
+            background-size: contain; 
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed; /* 讓背景圖片固定，不隨內容滾動 */
@@ -60,21 +61,19 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
+            background: white; /* 半透明淺色 */
             position: sticky;
             top: 0;
             z-index: 100;
-            color: var(--ac-text-light); /* 淺色文字 */
+            color: var(--ac-wood-medium); 
         }
         
         /* 調整地點文字在深色背景上為淺色 */
         .status-bar > div {
-            color: var(--ac-text-light);
+            color: var(--ac-wood-medium);
         }
-
         /* 新增：切換鄉鎮按鈕的基底樣式 */
-        .town-switch-btn {
+        .currentTownship,.town-switch-btn {
             /* 按鈕樣式改為與木紋背景搭的圓潤淺色 */
             background: var(--ac-cream);
             color: var(--ac-wood-medium);
@@ -166,12 +165,12 @@
 
         .hero-temp-container {
             gap: 10px;
-            margin: 15px 0;
+            margin: 10px 0;
         }
 
         /* 主 icon 讓它更像天氣瓶裡的結晶/物體 */
         .hero-icon {
-            font-size: 5rem;
+            font-size: 3rem;
             filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.1));
             animation: float 4s infinite ease-in-out; /* 模擬浮動 */
         }
@@ -184,7 +183,7 @@
         }
 
         .hero-temp {
-            font-size: 4.5rem;
+            font-size: 2rem;
             font-weight: 900;
             color: var(--ac-wood-medium); /* 棕色文字 */
             line-height: 1;
@@ -211,7 +210,7 @@
 
         .advice-icon {
             font-size: 2rem;
-            margin-bottom: 5px;
+            margin-bottom:1px;
         }
 
         /* 【修改 3-1】建議文字加粗，並讓它有詩詞感 */
@@ -226,7 +225,7 @@
         /* === 稍後預報：橫向滑動區 === */
         .section-title {
             font-size: 1.2rem;
-            color: var(--ac-text-light); /* 淺色標題 */
+            color: var(--ac-yellow); /* 淺色標題 */
             margin-bottom: 15px;
             margin-left: 10px;
             font-weight: 900;
@@ -333,17 +332,17 @@
 
         function getWeatherIcon(weather) {
             if (!weather) return "✨"; // 預設改為結晶
-            if (weather.includes("晴")) return "☀️";
-            if (weather.includes("多雲")) return "🌥️";
-            if (weather.includes("陰")) return "☁️";
-            if (weather.includes("雨")) return "💧"; // 雨天使用水滴，更像天氣瓶內的液體
-            if (weather.includes("雷")) return "⚡";
+            if (weather.includes("晴")) return "☀️~";
+            if (weather.includes("多雲")) return "🌥️~";
+            if (weather.includes("陰")) return "☁️~";
+            if (weather.includes("雨")) return "💧~"; // 雨天使用水滴，更像天氣瓶內的液體
+            if (weather.includes("雷")) return "⚡~";
             return "✨";
         }
 
         // 【修改 3-2】文案修改：七言絕句+天氣瓶概念
         function getAdvice(rainProb, maxTemp) {
-            let rainIcon = "🦋";
+            let rainIcon = "☁️🦩";
             let rainText = "晴空一鶴排雲上，不帶蓑衣亦無妨。"; // 晴天，不用帶傘
             
             // 降雨率超過 30%
@@ -402,12 +401,12 @@
                         <div class="advice-item">
                             <div class="advice-icon">${advice.rainIcon}</div>
                             <div class="advice-text">${advice.rainText}</div>
-                            <div style="font-size:0.7rem; color:#888">降雨率 ${current.rain}</div>
+                            <div style="font-size:1rem; color:black">💧${current.rain}</div>
                         </div>
                         <div class="advice-item">
                             <div class="advice-icon">${advice.clothIcon}</div>
                             <div class="advice-text">${advice.clothText}</div>
-                            <div style="font-size:0.7rem; color:#888">氣溫 ${current.minTemp}° ~ ${current.maxTemp}°</div>
+                            <div style="font-size:1rem; color:black">氣溫 ${current.minTemp}° ~ ${current.maxTemp}°</div>
                         </div>
                     </div>
                 </div>
@@ -437,7 +436,7 @@
                         <div class="mini-time">${p}</div>
                         <div class="mini-icon">${getWeatherIcon(f.weather)}</div>
                         <div class="mini-temp">${f.minTemp}° - ${f.maxTemp}°</div>
-                        <div style="font-size:0.8rem; color:#888; margin-top:5px;">💧${f.rain}</div>
+                        <div style="font-size:1rem; color:black; margin-top:3px;">💧${f.rain}</div>
                     </div>
                 `;
             });
