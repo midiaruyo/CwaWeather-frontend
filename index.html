@@ -23,6 +23,9 @@
             --ac-blue: #4FB5D9;
             --ac-dark: #58504A;
             --ac-card-border: #E6E0C8;
+            /* 新增：Line 官方顏色 */
+            --line-green: #00C300; 
+            --line-green-dark: #008D00;
         }
 
         * {
@@ -58,21 +61,51 @@
             z-index: 100;
         }
 
-        .location-pill {
+        /* 新增：切換鄉鎮按鈕的基底樣式 */
+        .town-switch-btn {
             background: var(--ac-yellow);
             color: var(--ac-brown);
-            padding: 5px 15px;
+            padding: 8px 15px; /* 稍微大一點點，更好點擊 */
             border-radius: 20px;
-            font-weight: 900;
-            font-size: 1.1rem;
-            transform: rotate(-2deg);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
             border: 2px solid white;
             box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s;
+        }
+
+        .town-switch-btn:active {
+            transform: translateY(1px);
+            box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        /* 【重要】新版：Line 分享按鈕樣式 (仿下載按鈕+綠色) */
+        .line-share-btn {
+            background: var(--line-green); /* 綠色背景 */
+            color: white; /* 白色文字 */
+            padding: 8px 15px; 
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem; /* 與 .town-switch-btn 保持一致 */
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 2px 2px 0 var(--line-green-dark); /* 使用深一點的橘色作為陰影 */
+            transition: transform 0.1s;
+            display: flex; /* 讓圖示和文字並排 */
+            align-items: center;
+            gap: 5px; /* 圖示和文字間距 */
+            white-space: nowrap; /* 防止按鈕內的文字換行 */
         }
         
+        .line-share-btn:active {
+            transform: translateY(1px);
+            box-shadow: 1px 1px 0 var(--ac-orange-dark);
+        }
+
         /* 新增：假資料提示標籤 */
         .mock-pill {
-            background: #ff7f7f; /* 醒目的紅色 */
+            background: #ff7f7f;
             color: white;
             padding: 2px 8px;
             border-radius: 10px;
@@ -81,14 +114,6 @@
             margin-left: 10px;
             display: inline-block;
             transform: rotate(2deg);
-        }
-
-        .update-pill {
-            font-size: 0.8rem;
-            color: white;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 4px 10px;
-            border-radius: 12px;
         }
 
         .container {
@@ -276,12 +301,21 @@
         <div style="font-size: 4rem; animation: bounce 2s infinite;">☁️</div>
         <p style="color: white; font-weight: bold; margin-top: 20px;">正在觀測雲的流動...</p>
     </div>
+    
     <div class="status-bar">
-        <div class="location-pill">
-            📍 苗栗縣
+        <div id="currentLocationText" style="font-size: 1.1rem; font-weight: 700;">
+            <span id="currentTownship">載入中...</span>
             <span id="mockDataIndicator"></span>
         </div>
-        <div id="updateTime" class="update-pill">更新中...</div>
+
+        <button id="switchTownButton" class="town-switch-btn">
+            切換鄉鎮
+        </button>
+
+        <button id="lineShareButton" class="line-share-btn">
+            <span style="font-size: 1.1rem;">⬆</span>
+            分享到 LINE
+        </button>
     </div>
 
     <div class="container" id="mainContent" style="display: none;">
@@ -299,7 +333,7 @@
         // === 1. 真假資料控制區 ===
         const API_URL = "https://weather-backend-midi.zeabur.app/api/weather/kaohsiung";
         // 假資料的路徑 (請替換成您 Github 上的 Raw 連結或本地路徑)
-        const MOCK_DATA_URL = "./maioli-weather-3days.json"; 
+        const MOCK_DATA_URL = "./maioli-weather-3days.json";
         // ========================
         // 🚨檢查 URL 中是否有 ?mock=true 參數
         const urlParams = new URLSearchParams(window.location.search);
@@ -357,28 +391,28 @@
             const avgTemp = Math.round((parseInt(current.maxTemp) + parseInt(current.minTemp)) / 2);
 
             document.getElementById('heroCard').innerHTML = `
-                        <div class="hero-card">
-                            <div class="hero-period">${period}</div>
-                            <div class="hero-temp-container">
-                                <div class="hero-icon">${getWeatherIcon(current.weather)}</div>
-                                <div class="hero-temp">${avgTemp}°</div>
-                            </div>
-                            <div class="hero-desc">${current.weather}</div>
-                            
-                            <div class="advice-grid">
-                                <div class="advice-item">
-                                    <div class="advice-icon">${advice.rainIcon}</div>
-                                    <div class="advice-text">${advice.rainText}</div>
-                                    <div style="font-size:0.7rem; color:#999">降雨率 ${current.rain}</div>
-                                </div>
-                                <div class="advice-item">
-                                    <div class="advice-icon">${advice.clothIcon}</div>
-                                    <div class="advice-text">${advice.clothText}</div>
-                                    <div style="font-size:0.7rem; color:#999">最高溫 ${current.maxTemp}°</div>
-                                </div>
-                            </div>
+                <div class="hero-card">
+                    <div class="hero-period">${period}</div>
+                    <div class="hero-temp-container">
+                        <div class="hero-icon">${getWeatherIcon(current.weather)}</div>
+                        <div class="hero-temp">${avgTemp}°</div>
+                    </div>
+                    <div class="hero-desc">${current.weather}</div>
+                    
+                    <div class="advice-grid">
+                        <div class="advice-item">
+                            <div class="advice-icon">${advice.rainIcon}</div>
+                            <div class="advice-text">${advice.rainText}</div>
+                            <div style="font-size:0.7rem; color:#999">降雨率 ${current.rain}</div>
                         </div>
-                    `;
+                        <div class="advice-item">
+                            <div class="advice-icon">${advice.clothIcon}</div>
+                            <div class="advice-text">${advice.clothText}</div>
+                            <div style="font-size:0.7rem; color:#999">最高溫 ${current.maxTemp}°</div>
+                        </div>
+                    </div>
+                </div>
+            `;
 
             // 2. 渲染稍後預報 (包含明天判斷)
             const scrollContainer = document.getElementById('futureForecasts');
@@ -397,30 +431,33 @@
                 }
 
                 scrollContainer.innerHTML += `
-                                <div class="mini-card">
-                                    <div class="mini-time">${p}</div>
-                                    <div class="mini-icon">${getWeatherIcon(f.weather)}</div>
-                                    <div class="mini-temp">${f.minTemp}° - ${f.maxTemp}°</div>
-                                    <div style="font-size:0.8rem; color:#888; margin-top:5px;">💧${f.rain}</div>
-                                </div>
-                            `;
+                    <div class="mini-card">
+                        <div class="mini-time">${p}</div>
+                        <div class="mini-icon">${getWeatherIcon(f.weather)}</div>
+                        <div class="mini-temp">${f.minTemp}° - ${f.maxTemp}°</div>
+                        <div style="font-size:0.8rem; color:#888; margin-top:5px;">💧${f.rain}</div>
+                    </div>
+                `;
             });
 
-            // 3. 右上角顯示今日日期
+            // 3. 調整鄉鎮名稱顯示 (對應新的 HTML 結構)
+            const defaultTownship = data.township || '苗栗縣'; // 從資料中取得或使用預設
+            document.getElementById('currentTownship').textContent = `📍 ${defaultTownship}`;
+
+            // 4. 暫時將切換按鈕的文字設置為當前日期
             const now = new Date();
             const month = now.getMonth() + 1;
             const date = now.getDate();
             const dayIndex = now.getDay();
             const days = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"];
-
-            document.getElementById('updateTime').textContent = `${month}月${date}日 ${days[dayIndex]}`;
+            document.getElementById('switchTownButton').textContent = `${month}/${date} ${days[dayIndex]}`;
         }
 
         async function fetchWeather() {
             let dataUrl = API_URL;
             let source = '真實 API';
             // 取得指示器元素
-            const indicatorEl = document.getElementById('mockDataIndicator');            
+            const indicatorEl = document.getElementById('mockDataIndicator');
             // 根據 USE_MOCK_DATA 判斷使用哪一個 URL
             if (USE_MOCK_DATA) {
                 dataUrl = MOCK_DATA_URL;
@@ -477,7 +514,31 @@
             }
         }
 
-        document.addEventListener("DOMContentLoaded", fetchWeather);
+        // Line 分享功能實作
+        function shareToLine() {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent(`【森森天氣】看看我這裡的最新天氣！超可愛介面！\n`);
+            // 由於 Line 分享連結不需要 API 支援，直接使用瀏覽器導向即可
+            window.open(`https://social-plugins.line.me/lineit/share?url=${url}&text=${text}`, '_blank');
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchWeather();
+            
+            // 監聽 Line 分享按鈕
+            const shareBtn = document.getElementById('lineShareButton');
+            if (shareBtn) {
+                shareBtn.addEventListener('click', shareToLine);
+            }
+
+            // 監聽切換鄉鎮按鈕 (未來改版使用)
+            const switchBtn = document.getElementById('switchTownButton');
+            if (switchBtn) {
+                switchBtn.addEventListener('click', () => {
+                    alert("切換鄉鎮功能將在未來版本提供！敬請期待！");
+                });
+            }
+        });
     </script>
 </body>
 
